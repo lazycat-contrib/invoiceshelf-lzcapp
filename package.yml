@@ -1,0 +1,18 @@
+package: community.lazycat.app.invoiceshelf
+name: InvoiceShelf
+version: 0.0.0
+description: "Invoicing and expense management for freelancers and small businesses."
+min_os_version: "1.5.0"
+homepage: https://github.com/InvoiceShelf/InvoiceShelf
+author: InvoiceShelf
+license: AGPL-3.0
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: InvoiceShelf
+    description: "开票与收支管理：给客户开发票、记录支出、跟踪回款，适合自由职业者和小团队做账。"
+  en:
+    name: InvoiceShelf
+    description: "Invoicing and expense management for freelancers and small businesses."

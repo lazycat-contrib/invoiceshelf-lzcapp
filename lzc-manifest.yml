@@ -1,0 +1,52 @@
+application:
+  subdomain: invoiceshelf
+  multi_instance: false
+  upstreams:
+    - location: /package-licenses/
+      backend: file:///lzcapp/pkg/content/licenses/
+    - location: /
+      backend: http://invoiceshelf:8080/
+
+services:
+  invoiceshelf:
+    # upstream: invoiceshelf/invoiceshelf:2.4.7
+    image: docker.1ms.run/invoiceshelf/invoiceshelf:2.4.7
+    environment:
+      - APP_NAME=InvoiceShelf
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - |-
+        APP_KEY=base64:{{ stable_secret "invoiceshelf_app_key" | replace "\r" "" | replace "\n" "" }}
+      - |-
+        APP_URL=https://{{ .S.AppDomain }}
+      - |-
+        SESSION_DOMAIN={{ .S.AppDomain }}
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/www/html/storage/app/database.sqlite
+      - SESSION_DRIVER=file
+      - CACHE_STORE=file
+      - QUEUE_CONNECTION=sync
+      - TZ=Asia/Shanghai
+    binds:
+      - /lzcapp/var/storage:/var/www/html/storage/
+      - /lzcapp/var/modules:/var/www/html/Modules/
+
+usage: |
+  InvoiceShelf 是开票与收支管理工具：给客户开发票、记录支出、跟踪回款。
+
+  使用方法：
+  1. 打开应用，会进入安装向导，填写管理员邮箱和密码，创建第一个账号。
+  2. 建客户和条目（商品或服务），然后开票。
+  3. 记录支出、标记发票已付款，在报表里看收入与支出。
+
+  数据与安全：
+  - 数据库（SQLite）和上传的附件都保存在 /lzcapp/var/storage，模块在 /lzcapp/var/modules。
+    卸载应用会一并删除，请定期备份。
+  - 应用密钥由平台稳定密钥生成，每个部署不同，不写成固定值。
+  - 本包不预置任何账号或默认口令；安装向导只在尚未安装时出现，完成后自动关闭。
+  - 应用经懒猫入口鉴权访问。
+
+  说明：
+  - 单容器部署，使用内置 SQLite，无需额外数据库。
+  - 未配置邮件服务，发邮件给客户、找回密码等依赖邮件的功能不可用。
+  - 未做真机验证：安装向导、登录、建客户开票、支出记录以及重启后持久化均未在设备上实测。
